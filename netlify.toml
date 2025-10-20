@@ -1,11 +1,13 @@
 [build]
   publish = ".next"
-  command = "npm run build"
+  command = "npm run build:netlify"
 
 [build.environment]
   NODE_VERSION = "18"
+  NPM_FLAGS = "--prefix=/opt/buildhome/.local"
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[functions]
+  external_node_modules = ["sharp"]

@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "build:netlify": "npm run clean && next build",
-    "clean": "rm -rf .next",
+    "clean": "rm -rf .next && rm -rf node_modules/.cache",
     "start": "next start",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
@@ -37,6 +37,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@netlify/plugin-nextjs": "^5.14.0",
     "@tailwindcss/postcss": "^4",
     "@types/jest": "^30.0.0",
     "@types/node": "^20.19.22",
