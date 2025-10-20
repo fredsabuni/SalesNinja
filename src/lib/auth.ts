@@ -36,27 +36,55 @@ function normalizePhoneNumber(phone: string): string {
 // Simple login with phone or email (no password for MVP)
 export async function loginDealer(identifier: string): Promise<Dealer> {
   try {
-    let query = supabase.from('dealers').select('*');
+    const cleanIdentifier = identifier.toLowerCase().trim();
+    console.log('Login attempt with identifier:', cleanIdentifier);
     
     // Check if identifier looks like a phone number
-    if (/[\d\+\-\s\(\)]/.test(identifier)) {
-      const normalizedPhone = normalizePhoneNumber(identifier);
-      query = query.eq('phone', normalizedPhone);
+    if (/[\d\+\-\s\(\)]/.test(cleanIdentifier)) {
+      const normalizedPhone = normalizePhoneNumber(cleanIdentifier);
+      console.log('Searching by phone:', normalizedPhone);
+      
+      const { data, error } = await supabase
+        .from('dealers')
+        .select('*')
+        .eq('phone', normalizedPhone)
+        .single();
+        
+      if (error || !data) {
+        console.error('Phone search error:', error);
+        throw new Error('Dealer not found');
+      }
+      
+      console.log('Found dealer by phone:', data);
+      localStorage.setItem('dealer', JSON.stringify(data));
+      return data;
+      
     } else {
-      // Treat as email
-      query = query.eq('email', identifier.toLowerCase().trim());
+      // Treat as email - try different approach
+      console.log('Searching by email:', cleanIdentifier);
+      
+      // Try using filter instead of eq to avoid PostgREST issues
+      const { data: dealers, error } = await supabase
+        .from('dealers')
+        .select('*')
+        .filter('email', 'eq', cleanIdentifier);
+        
+      if (error) {
+        console.error('Email search error:', error);
+        throw new Error('Database error');
+      }
+      
+      if (!dealers || dealers.length === 0) {
+        console.log('No dealer found with email:', cleanIdentifier);
+        throw new Error('Dealer not found');
+      }
+      
+      const dealer = dealers[0];
+      console.log('Found dealer by email:', dealer);
+      localStorage.setItem('dealer', JSON.stringify(dealer));
+      return dealer;
     }
 
-    const { data, error } = await query.single();
-
-    if (error || !data) {
-      throw new Error('Dealer not found');
-    }
-
-    // Store in localStorage for simple session management
-    localStorage.setItem('dealer', JSON.stringify(data));
-    
-    return data;
   } catch (error) {
     console.error('Login error:', error);
     throw error;

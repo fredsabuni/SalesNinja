@@ -10,6 +10,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { AppShell, Card, CardContent, Button } from '@/components';
 import { Dealer } from '@/types';
 import { supabase } from '@/lib/supabase';
+import { logoutDealer } from '@/lib/auth';
 
 export default function DealerDashboardPage() {
   const params = useParams();
@@ -24,6 +25,11 @@ export default function DealerDashboardPage() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const handleLogout = () => {
+    logoutDealer();
+    router.push('/login');
+  };
 
   useEffect(() => {
     const loadDealerData = async () => {
@@ -133,13 +139,18 @@ export default function DealerDashboardPage() {
     <AppShell title={`${dealer.name} Dashboard`}>
       <div className="space-y-6">
         {/* Header */}
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-neutral-900">
-            {dealer.name}
-          </h1>
-          <p className="text-neutral-600">
-            {dealer.company} • {dealer.phone}
-          </p>
+        <div className="flex items-center justify-between">
+          <div className="text-center flex-1">
+            <h1 className="text-2xl font-bold text-neutral-900">
+              {dealer.name}
+            </h1>
+            <p className="text-neutral-600">
+              {dealer.company} • {dealer.phone}
+            </p>
+          </div>
+          <Button variant="outline" onClick={handleLogout}>
+            Logout
+          </Button>
         </div>
 
         {/* Stats Cards */}
