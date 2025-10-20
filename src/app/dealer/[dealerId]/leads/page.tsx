@@ -126,6 +126,8 @@ export default function DealerLeadsPage() {
 
   // Export leads as CSV
   const exportCSV = () => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    
     const headers = [
       'Name', 'Phone', 'Residence', 'Interested Model', 'Next Contact',
       'Area', 'Ward', 'Officer', 'Officer Phone', 'Created At'
@@ -185,7 +187,7 @@ export default function DealerLeadsPage() {
             </svg>
             <h3 className="text-lg font-medium text-red-900 mb-2">Failed to Load Leads</h3>
             <p className="text-red-700 mb-4">{error}</p>
-            <Button onClick={() => window.location.reload()}>Try Again</Button>
+            <Button onClick={() => typeof window !== 'undefined' && window.location.reload()}>Try Again</Button>
           </div>
         </div>
       </AppShell>

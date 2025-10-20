@@ -18,7 +18,9 @@ export default function ErrorPage() {
   }, []);
 
   const handleReload = () => {
-    window.location.reload();
+    if (typeof window !== 'undefined') {
+      window.location.reload();
+    }
   };
 
   const handleGoHome = () => {
@@ -26,6 +28,8 @@ export default function ErrorPage() {
   };
 
   const handleReportBug = () => {
+    if (typeof window === 'undefined') return;
+    
     // In a real app, this would open a bug report form or email
     const subject = encodeURIComponent('Lead Generation Tool - Error Report');
     const body = encodeURIComponent(`

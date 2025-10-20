@@ -377,13 +377,15 @@ export default function Home() {
                     .join('\n');
 
                   // Create and download CSV
-                  const dataBlob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                  const url = URL.createObjectURL(dataBlob);
-                  const link = document.createElement('a');
-                  link.href = url;
-                  link.download = `leads-export-${new Date().toISOString().split('T')[0]}.csv`;
-                  link.click();
-                  URL.revokeObjectURL(url);
+                  if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+                    const dataBlob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(dataBlob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `leads-export-${new Date().toISOString().split('T')[0]}.csv`;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                  }
                 }
               } catch (error) {
                 console.error('Export failed:', error);
