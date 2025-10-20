@@ -10,9 +10,15 @@ import { AppShell, Card, CardContent, CardHeader, CardTitle, Button, FormField }
 import { Officer } from '@/types';
 
 export default function DealerOfficersPage() {
-  const params = useParams();
   const router = useRouter();
-  const dealerId = params.dealerId as string;
+  const params = useParams<{ dealerId: string }>();
+  const dealerId = params?.dealerId ?? '';
+
+  useEffect(() => {
+    if (!dealerId) {
+      router.replace('/login');
+    }
+  }, [dealerId, router]);
 
   const [officers, setOfficers] = useState<Officer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,6 +83,14 @@ export default function DealerOfficersPage() {
       console.error('Error deleting officer:', error);
     }
   };
+
+  if (!dealerId) {
+    return (
+      <AppShell title="Manage Officers" showBackButton onBackClick={() => router.push('/login')}>
+        <div className="py-12 text-center text-neutral-600">Loading dealer context...</div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell

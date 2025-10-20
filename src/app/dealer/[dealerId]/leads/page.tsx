@@ -20,9 +20,15 @@ interface LeadWithOfficer extends Lead {
 }
 
 export default function DealerLeadsPage() {
-  const params = useParams();
   const router = useRouter();
-  const dealerId = params.dealerId as string;
+  const params = useParams<{ dealerId: string }>();
+  const dealerId = params?.dealerId ?? '';
+
+  React.useEffect(() => {
+    if (!dealerId) {
+      router.replace('/login');
+    }
+  }, [dealerId, router]);
 
   // State management
   const [leads, setLeads] = React.useState<LeadWithOfficer[]>([]);
@@ -98,6 +104,14 @@ export default function DealerLeadsPage() {
       return true;
     });
   }, [leads, searchQuery, selectedOfficer, selectedDate]);
+
+  if (!dealerId) {
+    return (
+      <AppShell title="Your Leads" showBackButton onBackClick={() => router.push('/login')}>
+        <div className="py-12 text-center text-neutral-600">Loading dealer context...</div>
+      </AppShell>
+    );
+  }
 
   // Toggle card expansion
   const toggleCard = (leadId: string) => {
