@@ -39,8 +39,8 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   generateEtags: false,
   
-  // Output configuration to fix SSR issues
-  output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined
+  // Output configuration - disable standalone for Netlify
+  output: undefined
 };
 
 export default nextConfig;
