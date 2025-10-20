@@ -1,6 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   // Fix chunk loading issues
   experimental: {
     optimizePackageImports: [
@@ -43,4 +42,4 @@ const nextConfig: NextConfig = {
   output: undefined
 };
 
-export default nextConfig;
+module.exports = nextConfig;
