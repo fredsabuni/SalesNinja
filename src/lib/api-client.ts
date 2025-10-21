@@ -47,9 +47,14 @@ const inFlightMap: Record<string, number> = {};
 /**
  * Check if an error is retryable
  */
-function isRetryableError(error: any): boolean {
+function isRetryableError(error: unknown): boolean {
+  // Type guard to check if error has status property
+  const hasStatus = (err: unknown): err is { status: number } => {
+    return typeof err === 'object' && err !== null && 'status' in err;
+  };
+
   // Network errors (no response)
-  if (!error.status) {
+  if (!hasStatus(error)) {
     return true;
   }
 
@@ -94,7 +99,7 @@ function getCurrentDealerId(): string | null {
 
   try {
     const stored = localStorage.getItem('dealer');
-    const dealer = stored ? JSON.parse(stored) : null;
+    const dealer: { id?: string } | null = stored ? JSON.parse(stored) : null;
     return dealer?.id || null;
   } catch {
     return null;
@@ -104,7 +109,7 @@ function getCurrentDealerId(): string | null {
 /**
  * Enhanced fetch with retry logic and error handling
  */
-export async function apiRequest<T = any>(
+export async function apiRequest<T = unknown>(
   url: string,
   options: RequestInit = {},
   retryConfig: Partial<RetryConfig> = {}
@@ -115,10 +120,8 @@ export async function apiRequest<T = any>(
   // Count concurrent requests (dev anti-spam)
   inFlightMap[url] = (inFlightMap[url] || 0) + 1;
   if (process.env.NODE_ENV !== 'production' && inFlightMap[url] > 10) {
-    // eslint-disable-next-line no-console
     console.warn(`⚠️ [api-client] More than 10 concurrent requests to ${url}. Count: ${inFlightMap[url]}`);
     // Print basic stack to help debug
-    // eslint-disable-next-line no-console
     console.log(new Error().stack);
   }
 
@@ -148,11 +151,11 @@ export async function apiRequest<T = any>(
         // Handle HTTP errors
         if (!response.ok) {
           let errorMessage = 'Request failed';
-          let errorData: any = null;
+          let errorData: { error?: string; message?: string; code?: string } | null = null;
 
           try {
-            errorData = await response.json();
-            errorMessage = errorData.error || errorData.message || errorMessage;
+            errorData = await response.json() as { error?: string; message?: string; code?: string };
+            errorMessage = errorData?.error || errorData?.message || errorMessage;
           } catch {
             // If response is not JSON, use status text
             errorMessage = response.statusText || errorMessage;
@@ -176,9 +179,9 @@ export async function apiRequest<T = any>(
           // Success - parse and return response
           const contentType = response.headers.get('content-type');
           if (contentType && contentType.includes('application/json')) {
-            return await response.json();
+            return await response.json() as T;
           } else {
-            return response.text() as any;
+            return response.text() as T;
           }
         }
       } catch (error) {
@@ -188,8 +191,8 @@ export async function apiRequest<T = any>(
         } else {
           const isNetworkError =
             error instanceof TypeError ||
-            (error as any).name === 'AbortError' ||
-            (error as any).code === 'NETWORK_ERROR';
+            (error as Error & { name?: string }).name === 'AbortError' ||
+            (error as Error & { code?: string }).code === 'NETWORK_ERROR';
 
           lastError = new ApiClientError({
             message: isNetworkError
@@ -225,12 +228,12 @@ export async function apiRequest<T = any>(
  * Convenience methods for common HTTP verbs
  */
 export const apiClient = {
-  get: <T = any>(url: string, retryConfig?: Partial<RetryConfig>): Promise<T> =>
+  get: <T = unknown>(url: string, retryConfig?: Partial<RetryConfig>): Promise<T> =>
     apiRequest<T>(url, { method: 'GET' }, retryConfig),
 
-  post: <T = any>(
+  post: <T = unknown>(
     url: string,
-    data?: any,
+    data?: unknown,
     retryConfig?: Partial<RetryConfig>
   ): Promise<T> =>
     apiRequest<T>(
@@ -243,9 +246,9 @@ export const apiClient = {
       retryConfig
     ),
 
-  put: <T = any>(
+  put: <T = unknown>(
     url: string,
-    data?: any,
+    data?: unknown,
     retryConfig?: Partial<RetryConfig>
   ): Promise<T> =>
     apiRequest<T>(
@@ -258,6 +261,6 @@ export const apiClient = {
       retryConfig
     ),
 
-  delete: <T = any>(url: string, retryConfig?: Partial<RetryConfig>): Promise<T> =>
+  delete: <T = unknown>(url: string, retryConfig?: Partial<RetryConfig>): Promise<T> =>
     apiRequest<T>(url, { method: 'DELETE' }, retryConfig),
 };

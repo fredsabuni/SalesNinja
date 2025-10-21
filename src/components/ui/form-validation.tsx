@@ -147,7 +147,7 @@ export const validationHelpers = {
 
     // Remove all non-digit characters for validation
     const digits = value.replace(/\D/g, '');
-    
+
     if (digits.length < 10) {
       return {
         field: 'Phone Number',
@@ -238,7 +238,7 @@ export const validationHelpers = {
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     if (value < today) {
       return {
         field: fieldName,
@@ -251,7 +251,7 @@ export const validationHelpers = {
     // Check if date is too far in the future (1 year)
     const oneYearFromNow = new Date();
     oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
-    
+
     if (value > oneYearFromNow) {
       return {
         field: fieldName,
@@ -282,16 +282,17 @@ export const validationHelpers = {
   /**
    * Validate all form fields and return comprehensive error list
    */
-  validateForm: (formData: Record<string, any>, validationRules: Record<string, (value: any) => ValidationError | null>): ValidationError[] => {
+  validateForm: <T extends Record<string, unknown>>(formData: T, validationRules: Record<keyof T, (value: T[keyof T]) => ValidationError | null>): ValidationError[] => {
     const errors: ValidationError[] = [];
-    
-    Object.entries(validationRules).forEach(([fieldName, validator]) => {
+
+    (Object.keys(validationRules) as Array<keyof T>).forEach((fieldName) => {
+      const validator = validationRules[fieldName];
       const error = validator(formData[fieldName]);
       if (error) {
         errors.push(error);
       }
     });
-    
+
     return errors;
   }
 };

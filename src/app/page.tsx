@@ -331,7 +331,7 @@ export default function Home() {
               try {
                 const response = await fetch('/api/leads?public=true');
                 if (response.ok) {
-                  const leads = await response.json();
+                  const leads: Lead[] = await response.json();
 
                   // Convert to CSV
                   if (leads.length === 0) {
@@ -356,18 +356,18 @@ export default function Home() {
                   ];
 
                   // CSV rows
-                  const csvRows = leads.map((lead: any) => [
-                    lead.lead_name || '',
-                    lead.phone_contact || '',
-                    lead.residence || '',
-                    lead.interested_phone_model || '',
-                    lead.next_contact_date || '',
-                    lead.area_of_activity || '',
-                    lead.ward || '',
-                    lead.gps_latitude || '',
-                    lead.gps_longitude || '',
-                    lead.officer?.name || '',
-                    lead.officer?.phone || '',
+                  const csvRows = leads.map((lead) => [
+                    lead.lead_name ?? '',
+                    lead.phone_contact ?? '',
+                    lead.residence ?? '',
+                    lead.interested_phone_model ?? '',
+                    lead.next_contact_date ?? '',
+                    lead.area_of_activity ?? '',
+                    lead.ward ?? '',
+                    lead.gps_latitude?.toString() ?? '',
+                    lead.gps_longitude?.toString() ?? '',
+                    lead.officer?.name ?? '',
+                    lead.officer?.phone ?? '',
                     lead.created_at ? new Date(lead.created_at).toLocaleDateString() : ''
                   ]);
 

@@ -93,7 +93,7 @@ export function useLoadingState(initialState: LoadingState = { isLoading: false 
 /**
  * Hook for managing async operations with loading states
  */
-export function useAsyncOperation<T = any>() {
+export function useAsyncOperation<T = unknown>() {
   const loading = useLoadingState();
   const [error, setError] = useState<Error | null>(null);
   const [data, setData] = useState<T | null>(null);

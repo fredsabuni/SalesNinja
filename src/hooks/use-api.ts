@@ -14,13 +14,13 @@ export interface ApiState<T> {
   lastUpdated: Date | null;
 }
 
-export interface UseApiOptions {
+export interface UseApiOptions<T = unknown> {
   retryConfig?: Partial<RetryConfig>;
-  onSuccess?: (data: any) => void;
+  onSuccess?: (data: T) => void;
   onError?: (error: UserFriendlyError) => void;
 }
 
-export function useApi<T = any>(options: UseApiOptions = {}) {
+export function useApi<T = unknown>(options: UseApiOptions<T> = {}) {
   const [state, setState] = useState<ApiState<T>>({
     data: null,
     loading: false,
@@ -32,15 +32,15 @@ export function useApi<T = any>(options: UseApiOptions = {}) {
     apiCall: () => Promise<T>,
     context?: string
   ): Promise<T | null> => {
-    setState(prev => ({ 
-      ...prev, 
-      loading: true, 
-      error: null 
+    setState(prev => ({
+      ...prev,
+      loading: true,
+      error: null
     }));
 
     try {
       const data = await apiCall();
-      
+
       setState(prev => ({
         ...prev,
         data,
@@ -53,7 +53,7 @@ export function useApi<T = any>(options: UseApiOptions = {}) {
       return data;
     } catch (error) {
       const userError = getUserFriendlyError(error);
-      
+
       setState(prev => ({
         ...prev,
         loading: false,
@@ -62,12 +62,12 @@ export function useApi<T = any>(options: UseApiOptions = {}) {
 
       // Log error for debugging
       logError(error, context);
-      
+
       // Report error for tracking
       if (error instanceof Error) {
         reportApiError(error, context || 'API call', 'UNKNOWN');
       }
-      
+
       options.onError?.(userError);
       return null;
     }
@@ -97,14 +97,14 @@ export function useApi<T = any>(options: UseApiOptions = {}) {
     );
   }, [execute, options.retryConfig]);
 
-  const post = useCallback((url: string, data?: any, context?: string) => {
+  const post = useCallback((url: string, data?: unknown, context?: string) => {
     return execute(
       () => apiClient.post<T>(url, data, options.retryConfig),
       context || `POST ${url}`
     );
   }, [execute, options.retryConfig]);
 
-  const put = useCallback((url: string, data?: any, context?: string) => {
+  const put = useCallback((url: string, data?: unknown, context?: string) => {
     return execute(
       () => apiClient.put<T>(url, data, options.retryConfig),
       context || `PUT ${url}`

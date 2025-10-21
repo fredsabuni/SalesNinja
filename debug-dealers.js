@@ -1,7 +1,7 @@
 // Debug script to check dealers in database
 // Run with: node debug-dealers.js
 
-const { createClient } = require('@supabase/supabase-js');
+import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = 'https://znqjngtmhnvekdprmlju.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpucWpuZ3RtaG52ZWtkcHJtbGp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5NTgyMzgsImV4cCI6MjA3NjUzNDIzOH0.Ds8TtFiD5H1AZA5a9fuMXi6EUesKXWqU_PJA2sECwZg';

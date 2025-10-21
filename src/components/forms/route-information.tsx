@@ -61,7 +61,7 @@ export const RouteInformation: React.FC = () => {
   React.useEffect(() => {
     const { areaOfActivity, ward, gpsCoordinates } = watchedValues;
     updateRouteData({ areaOfActivity, ward, gpsCoordinates });
-  }, [watchedValues.areaOfActivity, watchedValues.ward, watchedValues.gpsCoordinates, updateRouteData]);
+  }, [watchedValues, updateRouteData]);
 
   // Auto-set current officer from localStorage
   React.useEffect(() => {

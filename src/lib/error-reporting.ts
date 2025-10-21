@@ -27,7 +27,7 @@ export interface Breadcrumb {
   timestamp: string;
   category: 'navigation' | 'user' | 'api' | 'error' | 'info';
   message: string;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
 }
 
 class ErrorReporter {
@@ -229,7 +229,7 @@ class ErrorReporter {
   /**
    * Track user actions
    */
-  trackUserAction(action: string, data?: Record<string, any>) {
+  trackUserAction(action: string, data?: Record<string, unknown>) {
     this.addBreadcrumb({
       category: 'user',
       message: `User action: ${action}`,
@@ -310,7 +310,7 @@ export const reportValidationError = (error: Error, fieldName: string) => {
 import React from 'react';
 
 export function useErrorReporting() {
-  const trackAction = React.useCallback((action: string, data?: Record<string, any>) => {
+  const trackAction = React.useCallback((action: string, data?: Record<string, unknown>) => {
     errorReporter.trackUserAction(action, data);
   }, []);
 

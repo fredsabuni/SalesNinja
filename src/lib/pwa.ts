@@ -2,6 +2,19 @@
  * PWA utilities for service worker registration and app installation
  */
 
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms?: string[];
+  prompt: () => Promise<void>;
+  userChoice: Promise<{
+    outcome: 'accepted' | 'dismissed';
+    platform: string;
+  }>;
+}
+
+interface NavigatorWithStandalone extends Navigator {
+  standalone?: boolean;
+}
+
 // Register service worker
 export const registerServiceWorker = async (): Promise<void> => {
   if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
@@ -45,16 +58,17 @@ export const canInstallApp = (): boolean => {
 };
 
 // Install app prompt
-let deferredPrompt: any = null;
+let deferredPrompt: BeforeInstallPromptEvent | null = null;
 
 export const setupInstallPrompt = (): void => {
   if (typeof window === 'undefined') return;
 
-  window.addEventListener('beforeinstallprompt', (e) => {
+  window.addEventListener('beforeinstallprompt', (event) => {
+    const promptEvent = event as BeforeInstallPromptEvent;
     // Prevent the mini-infobar from appearing on mobile
-    e.preventDefault();
+    promptEvent.preventDefault();
     // Stash the event so it can be triggered later
-    deferredPrompt = e;
+    deferredPrompt = promptEvent;
     
     // Show install button or banner
     console.log('App can be installed');
@@ -94,10 +108,11 @@ export const promptInstall = async (): Promise<boolean> => {
 // Check if app is running in standalone mode (installed)
 export const isStandalone = (): boolean => {
   if (typeof window === 'undefined') return false;
+  const navigatorWithStandalone = window.navigator as NavigatorWithStandalone;
   
   return (
     window.matchMedia('(display-mode: standalone)').matches ||
-    (window.navigator as any).standalone === true ||
+    navigatorWithStandalone.standalone === true ||
     document.referrer.includes('android-app://')
   );
 };

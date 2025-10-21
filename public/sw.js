@@ -1,5 +1,4 @@
 // Service Worker for Samsung Lead Generation Tool
-const CACHE_NAME = 'samsung-leads-v1';
 const STATIC_CACHE = 'samsung-leads-static-v1';
 const DYNAMIC_CACHE = 'samsung-leads-dynamic-v1';
 
@@ -8,12 +7,6 @@ const STATIC_ASSETS = [
   '/',
   '/manifest.json'
   // Remove icon paths that don't exist
-];
-
-// API routes to cache
-const API_ROUTES = [
-  '/api/officers',
-  '/api/leads',
 ];
 
 // Install event - cache static assets
