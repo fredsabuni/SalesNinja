@@ -21,6 +21,7 @@
     "paths": {
       "@/*": ["./src/*"]
     },
+    "baseUrl": ".",
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "noImplicitAny": true,
